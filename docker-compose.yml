@@ -3,6 +3,7 @@ version: '3.8'
 services:
   digitalocean_exporter:
     image: ghcr.io/koshiirra/digitalocean_exporter:latest
+    pull_policy: always
     build:
       context: .
       dockerfile: Dockerfile
