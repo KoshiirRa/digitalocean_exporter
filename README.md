@@ -13,24 +13,37 @@ https://github.com/metalmatze/digitalocean_exporter/releases
 To deploy directly onto digitalocean, click the button below.  
 [![Deploy to DO](https://mp-assets1.sfo2.digitaloceanspaces.com/deploy-to-do/do-btn-blue.svg)](https://cloud.digitalocean.com/apps/new?repo=https://github.com/metalmatze/digitalocean_exporter/tree/master)
 
-#### Docker
+#### Docker (GHCR)
 
 ```bash
-docker pull metalmatze/digitalocean_exporter:0.6.1
-docker run --rm -p 9212:9212 -e DIGITALOCEAN_TOKEN=XXX metalmatze/digitalocean_exporter:0.6.1
+docker pull ghcr.io/koshiirra/digitalocean_exporter:latest
+docker run --rm -p 9212:9212 -e DIGITALOCEAN_TOKEN=XXX ghcr.io/koshiirra/digitalocean_exporter:latest
 ```
 
-Example `docker-compose.yml` with Transmission also running in docker.
+#### Docker Compose
+
+Using the included `docker-compose.yml`:
 
 ```yaml
-digitalocean_exporter:
-    image: metalmatze/digitalocean_exporter:0.6.1
-    environment:
-    - '-do.token=XXX'
-    restart: always
+version: '3.8'
+
+services:
+  digitalocean_exporter:
+    image: ghcr.io/koshiirra/digitalocean_exporter:latest
+    container_name: digitalocean_exporter
+    restart: unless-stopped
     ports:
-    - "127.0.0.1:9212:9212"
+      - "9212:9212"
+    environment:
+      - DIGITALOCEAN_TOKEN=${DIGITALOCEAN_TOKEN}
 ```
+
+Run with:
+
+```bash
+DIGITALOCEAN_TOKEN=your_token_here docker-compose up -d
+```
+
 
 ### Configuration
 

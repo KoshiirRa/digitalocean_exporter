@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  digitalocean_exporter:
+    image: ghcr.io/koshiirra/digitalocean_exporter:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: digitalocean_exporter
+    restart: unless-stopped
+    ports:
+      - "9212:9212"
+    environment:
+      - DIGITALOCEAN_TOKEN=${DIGITALOCEAN_TOKEN}
+      - DIGITALOCEAN_SPACES_ACCESS_KEY_ID=${DIGITALOCEAN_SPACES_ACCESS_KEY_ID:-}
+      - DIGITALOCEAN_SPACES_ACCESS_KEY_SECRET=${DIGITALOCEAN_SPACES_ACCESS_KEY_SECRET:-}
+      - DEBUG=${DEBUG:-false}
+      - WEB_ADDR=${WEB_ADDR:-:9212}
+      - WEB_PATH=${WEB_PATH:-/metrics}
