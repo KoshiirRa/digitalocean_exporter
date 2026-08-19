@@ -127,10 +127,15 @@ func (c *DropletCollector) Collect(ch chan<- prometheus.Metric) {
 	}
 
 	for _, droplet := range droplets {
+		regionSlug := ""
+		if droplet.Region != nil {
+			regionSlug = droplet.Region.Slug
+		}
+
 		labels := []string{
 			fmt.Sprintf("%d", droplet.ID),
 			droplet.Name,
-			droplet.Region.Slug,
+			regionSlug,
 		}
 
 		var active float64
@@ -161,16 +166,23 @@ func (c *DropletCollector) Collect(ch chan<- prometheus.Metric) {
 			float64(droplet.Disk*1000*1000*1000),
 			labels...,
 		)
+
+		var priceHourly, priceMonthly float64
+		if droplet.Size != nil {
+			priceHourly = droplet.Size.PriceHourly
+			priceMonthly = droplet.Size.PriceMonthly
+		}
+
 		ch <- prometheus.MustNewConstMetric(
 			c.PriceHourly,
 			prometheus.GaugeValue,
-			float64(droplet.Size.PriceHourly),
+			priceHourly,
 			labels...,
 		)
 		ch <- prometheus.MustNewConstMetric(
 			c.PriceMonthly,
 			prometheus.GaugeValue,
-			float64(droplet.Size.PriceMonthly),
+			priceMonthly,
 			labels...,
 		)
 	}

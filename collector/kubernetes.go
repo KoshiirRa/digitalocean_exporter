@@ -84,7 +84,7 @@ func (c *KubernetesCollector) Collect(ch chan<- prometheus.Metric) {
 
 		var active float64
 		//TODO(dazwilkin) better reflect richer Kubernetes cluster states
-		if cluster.Status.State == godo.KubernetesClusterStatusRunning {
+		if cluster.Status != nil && cluster.Status.State == godo.KubernetesClusterStatusRunning {
 			active = 1.0
 		}
 		ch <- prometheus.MustNewConstMetric(

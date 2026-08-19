@@ -69,10 +69,15 @@ func (c *FloatingIPCollector) Collect(ch chan<- prometheus.Metric) {
 			dropletName = ip.Droplet.Name
 		}
 
+		regionSlug := ""
+		if ip.Region != nil {
+			regionSlug = ip.Region.Slug
+		}
+
 		labels := []string{
 			dropletID,
 			dropletName,
-			ip.Region.Slug,
+			regionSlug,
 			ip.IP,
 		}
 

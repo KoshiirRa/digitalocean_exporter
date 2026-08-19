@@ -71,12 +71,14 @@ func (c *BalanceCollector) Collect(ch chan<- prometheus.Metric) {
 	ctx, cancel := context.WithTimeout(context.Background(), c.timeout)
 	defer cancel()
 	bal, _, err := c.client.Balance.Get(ctx)
-	if err != nil {
+	if err != nil || bal == nil {
 		c.errors.WithLabelValues("balance").Add(1)
-		level.Warn(c.logger).Log(
-			"msg", "can't get balance",
-			"err", err,
-		)
+		if err != nil {
+			level.Warn(c.logger).Log(
+				"msg", "can't get balance",
+				"err", err,
+			)
+		}
 		return
 	}
 

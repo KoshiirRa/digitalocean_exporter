@@ -109,12 +109,18 @@ func (c *DBCollector) Collect(ch chan<- prometheus.Metric) {
 	}
 
 	for _, db := range dbs {
+		var day, hour, pending string
+		if db.MaintenanceWindow != nil {
+			day = db.MaintenanceWindow.Day
+			hour = db.MaintenanceWindow.Hour
+			pending = strconv.FormatBool(db.MaintenanceWindow.Pending)
+		}
 		labels := []string{
 			db.ID,
 			db.Name,
-			db.MaintenanceWindow.Day,
-			db.MaintenanceWindow.Hour,
-			strconv.FormatBool(db.MaintenanceWindow.Pending),
+			day,
+			hour,
+			pending,
 			db.RegionSlug,
 			db.SizeSlug,
 			db.EngineSlug,

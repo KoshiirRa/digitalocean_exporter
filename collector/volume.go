@@ -60,10 +60,14 @@ func (c *VolumeCollector) Collect(ch chan<- prometheus.Metric) {
 	}
 
 	for _, vol := range volumes {
+		regionSlug := ""
+		if vol.Region != nil {
+			regionSlug = vol.Region.Slug
+		}
 		labels := []string{
 			vol.ID,
 			vol.Name,
-			vol.Region.Slug,
+			regionSlug,
 		}
 
 		ch <- prometheus.MustNewConstMetric(

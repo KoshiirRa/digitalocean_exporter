@@ -101,11 +101,19 @@ func (c *AppCollector) Collect(ch chan<- prometheus.Metric) {
 		if app.InProgressDeployment != nil {
 			phase = string(app.InProgressDeployment.Phase)
 		}
+		name := ""
+		if app.Spec != nil {
+			name = app.Spec.Name
+		}
+		regionSlug := ""
+		if app.Region != nil {
+			regionSlug = app.Region.Slug
+		}
 		labels := []string{
 			app.ID,
-			app.Spec.Name,
+			name,
 			app.TierSlug,
-			app.Region.Slug,
+			regionSlug,
 			phase,
 		}
 		ch <- prometheus.MustNewConstMetric(

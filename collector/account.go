@@ -70,12 +70,14 @@ func (c *AccountCollector) Collect(ch chan<- prometheus.Metric) {
 	ctx, cancel := context.WithTimeout(context.Background(), c.timeout)
 	defer cancel()
 	acc, _, err := c.client.Account.Get(ctx)
-	if err != nil {
+	if err != nil || acc == nil {
 		c.errors.WithLabelValues("account").Add(1)
-		level.Warn(c.logger).Log(
-			"msg", "can't get account",
-			"err", err,
-		)
+		if err != nil {
+			level.Warn(c.logger).Log(
+				"msg", "can't get account",
+				"err", err,
+			)
+		}
 		return
 	}
 
