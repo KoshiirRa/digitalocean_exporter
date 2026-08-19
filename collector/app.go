@@ -64,6 +64,7 @@ func (c *AppCollector) Collect(ch chan<- prometheus.Metric) {
 				"msg", "can't list apps",
 				"err", err,
 			)
+			return
 		}
 
 		// append the current page's apps to our list
@@ -71,8 +72,8 @@ func (c *AppCollector) Collect(ch chan<- prometheus.Metric) {
 			apps = append(apps, *a)
 		}
 
-		// if we are at the last page, break out the for loop
-		if resp.Links == nil || resp.Links.IsLastPage() {
+		// if we are at the last page or resp is nil, break out the for loop
+		if resp == nil || resp.Links == nil || resp.Links.IsLastPage() {
 			break
 		}
 
@@ -83,6 +84,7 @@ func (c *AppCollector) Collect(ch chan<- prometheus.Metric) {
 				"msg", "can't read current page",
 				"err", err,
 			)
+			return
 		}
 
 		opt.Page = page + 1

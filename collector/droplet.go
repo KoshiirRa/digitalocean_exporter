@@ -108,8 +108,8 @@ func (c *DropletCollector) Collect(ch chan<- prometheus.Metric) {
 			droplets = append(droplets, d)
 		}
 
-		// if we are at the last page, break out the for loop
-		if resp.Links == nil || resp.Links.IsLastPage() {
+		// if we are at the last page or resp is nil, break out the for loop
+		if resp == nil || resp.Links == nil || resp.Links.IsLastPage() {
 			break
 		}
 
@@ -120,6 +120,7 @@ func (c *DropletCollector) Collect(ch chan<- prometheus.Metric) {
 				"msg", "can't read current page",
 				"err", err,
 			)
+			return
 		}
 
 		opt.Page = page + 1

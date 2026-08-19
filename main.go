@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"runtime"
+	"strconv"
 	"time"
 
 	arg "github.com/alexflint/go-arg"
@@ -37,7 +38,7 @@ type Config struct {
 	DigitalOceanToken     string `arg:"env:DIGITALOCEAN_TOKEN"`
 	SpacesAccessKeyID     string `arg:"env:DIGITALOCEAN_SPACES_ACCESS_KEY_ID"`
 	SpacesAccessKeySecret string `arg:"env:DIGITALOCEAN_SPACES_ACCESS_KEY_SECRET"`
-	HTTPTimeout           int    `arg:"env:HTTP_TIMEOUT"`
+	HTTPTimeout           string `arg:"env:HTTP_TIMEOUT"`
 	WebAddr               string `arg:"env:WEB_ADDR"`
 	WebPath               string `arg:"env:WEB_PATH"`
 }
@@ -51,7 +52,7 @@ func main() {
 	_ = godotenv.Load()
 
 	c := Config{
-		HTTPTimeout: 5000,
+		HTTPTimeout: "30s",
 		WebPath:     "/metrics",
 		WebAddr:     ":9212",
 	}
@@ -90,7 +91,18 @@ func main() {
 	oauthClient := oauth2.NewClient(context.TODO(), c)
 	client := godo.NewClient(oauthClient)
 
-	timeout := time.Duration(c.HTTPTimeout) * time.Millisecond
+	timeout, err := time.ParseDuration(c.HTTPTimeout)
+	if err != nil {
+		if seconds, err := strconv.Atoi(c.HTTPTimeout); err == nil {
+			if seconds > 300 {
+				timeout = time.Duration(seconds) * time.Millisecond
+			} else {
+				timeout = time.Duration(seconds) * time.Second
+			}
+		} else {
+			timeout = 30 * time.Second
+		}
+	}
 
 	errors := prometheus.NewCounterVec(prometheus.CounterOpts{
 		Name: "digitalocean_errors_total",

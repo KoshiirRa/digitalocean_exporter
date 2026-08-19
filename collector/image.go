@@ -61,11 +61,15 @@ func (c *ImageCollector) Collect(ch chan<- prometheus.Metric) {
 	}
 
 	for _, img := range images {
+		var region string
+		if len(img.Regions) > 0 {
+			region = img.Regions[0]
+		}
 		ch <- prometheus.MustNewConstMetric(
 			c.MinDiskSize,
 			prometheus.GaugeValue,
 			float64(img.MinDiskSize*1024*1024*1024),
-			fmt.Sprintf("%d", img.ID), img.Name, img.Regions[0], img.Type, img.Distribution,
+			fmt.Sprintf("%d", img.ID), img.Name, region, img.Type, img.Distribution,
 		)
 	}
 }

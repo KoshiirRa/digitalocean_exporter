@@ -82,6 +82,7 @@ func (c *DBCollector) Collect(ch chan<- prometheus.Metric) {
 				"msg", "can't list databases",
 				"err", err,
 			)
+			return
 		}
 
 		// append the current page's dbs to our list
@@ -89,8 +90,8 @@ func (c *DBCollector) Collect(ch chan<- prometheus.Metric) {
 			dbs = append(dbs, d)
 		}
 
-		// if we are at the last page, break out the for loop
-		if resp.Links == nil || resp.Links.IsLastPage() {
+		// if we are at the last page or resp is nil, break out the for loop
+		if resp == nil || resp.Links == nil || resp.Links.IsLastPage() {
 			break
 		}
 
@@ -101,6 +102,7 @@ func (c *DBCollector) Collect(ch chan<- prometheus.Metric) {
 				"msg", "can't read current page",
 				"err", err,
 			)
+			return
 		}
 
 		opt.Page = page + 1

@@ -90,10 +90,16 @@ func (c *DomainCollector) Collect(ch chan<- prometheus.Metric) {
 			domain.Name,
 		)
 
-		//ctx, cancel := context.WithTimeout(ctx, c.timeout)
-		//cancel()
-		ctx := context.TODO()
-		records, _, _ := c.client.Domains.Records(ctx, domain.Name, nil)
+		records, _, err := c.client.Domains.Records(ctx, domain.Name, nil)
+		if err != nil {
+			c.errors.WithLabelValues("domain").Add(1)
+			level.Warn(c.logger).Log(
+				"msg", "can't list domain records",
+				"domain", domain.Name,
+				"err", err,
+			)
+			continue
+		}
 		for _, record := range records {
 			ch <- prometheus.MustNewConstMetric(
 				c.DomainRecordPort,
