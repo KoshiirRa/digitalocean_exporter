@@ -52,7 +52,7 @@ func main() {
 	_ = godotenv.Load()
 
 	c := Config{
-		HTTPTimeout: "30s",
+		HTTPTimeout: "15s",
 		WebPath:     "/metrics",
 		WebAddr:     ":9212",
 	}
